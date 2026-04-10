@@ -1,0 +1,8 @@
+---
+# Handlers for the jenkins role
+
+- name: Restart Jenkins
+  systemd:
+    name: jenkins
+    state: restarted
+    daemon_reload: true

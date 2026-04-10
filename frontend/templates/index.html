@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PRESTIGE MOTORS — Luxury Car Resale Showroom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #07070f;
+      --bg2:      #0d0d1a;
+      --bg3:      #12122a;
+      --card:     #0f0f1e;
+      --gold:     #c9a84c;
+      --gold2:    #e8d28a;
+      --gold3:    #8a6a1a;
+      --text:     #f0eeea;
+      --muted:    #7a7a9a;
+      --border:   #1e1e38;
+      --red:      #e05050;
+      --green:    #3ecf8e;
+      --radius:   14px;
+      --shadow:   0 8px 40px rgba(0,0,0,0.7);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--gold3); border-radius: 3px; }
+
+    /* ═══════════════════ NAVBAR ══════════════════ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: rgba(7,7,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+      transition: padding 0.3s;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 700;
+      letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--text); font-weight: 300; }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-badge {
+      background: linear-gradient(135deg, var(--gold3), var(--gold));
+      color: #000; font-size: 0.7rem; font-weight: 600;
+      padding: 4px 14px; border-radius: 2px; letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ═══════════════════ HERO ══════════════════ */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 70% 50%, rgba(201,168,76,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 80%, rgba(74,108,239,0.05) 0%, transparent 50%),
+        var(--bg);
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 79px,
+        rgba(201,168,76,0.03) 80px
+      ),
+      repeating-linear-gradient(
+        90deg, transparent, transparent 79px,
+        rgba(201,168,76,0.03) 80px
+      );
+    }
+    .hero-content {
+      position: relative; z-index: 1;
+      text-align: center; padding: 0 2rem; max-width: 900px;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.7rem; letter-spacing: 6px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.5rem;
+      padding: 6px 20px; border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 2px;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 300; line-height: 1.05;
+      letter-spacing: -1px; color: var(--text);
+      margin-bottom: 0.3em;
+    }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+    .hero-sub {
+      font-size: 1rem; color: var(--muted);
+      max-width: 500px; margin: 0 auto 2.5rem;
+      line-height: 1.8; font-weight: 300;
+    }
+    .hero-cta {
+      display: inline-flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold3), var(--gold));
+      color: #000; font-weight: 600; font-size: 0.8rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 1rem 2.5rem; border: none; border-radius: 3px;
+      cursor: pointer; text-decoration: none;
+      transition: filter 0.2s, transform 0.2s;
+    }
+    .btn-gold:hover { filter: brightness(1.15); transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--gold); font-weight: 500; font-size: 0.8rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 1rem 2.5rem;
+      border: 1px solid rgba(201,168,76,0.4); border-radius: 3px;
+      cursor: pointer; text-decoration: none;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .btn-outline:hover {
+      border-color: var(--gold); background: rgba(201,168,76,0.07);
+      transform: translateY(-2px);
+    }
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      color: var(--muted); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase;
+    }
+    .hero-scroll::after {
+      content: '';
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scroll-line 1.8s ease infinite;
+    }
+    @keyframes scroll-line {
+      0%   { transform: scaleY(0); transform-origin: top; }
+      50%  { transform: scaleY(1); transform-origin: top; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ═══════════════════ STATS BAR ══════════════════ */
+    .stats-bar {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex; justify-content: center; gap: 5rem; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem; font-weight: 600; color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.7rem; letter-spacing: 2px; color: var(--muted);
+      text-transform: uppercase; margin-top: 0.3rem;
+    }
+
+    /* ═══════════════════ SECTION CHROME ══════════════════ */
+    .section { padding: 6rem 3rem; max-width: 1400px; margin: 0 auto; }
+    .section-header { margin-bottom: 3.5rem; }
+    .section-eyebrow {
+      font-size: 0.7rem; letter-spacing: 4px; color: var(--gold);
+      text-transform: uppercase; margin-bottom: 0.6rem;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3rem); font-weight: 300;
+      color: var(--text); letter-spacing: -0.5px;
+    }
+    .section-title span { color: var(--gold); font-style: italic; }
+    .divider {
+      width: 60px; height: 1px;
+      background: linear-gradient(to right, var(--gold), transparent);
+      margin: 1rem 0;
+    }
+
+    /* ═══════════════════ FILTER BAR ══════════════════ */
+    .filter-bar {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 2rem;
+      display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;
+      margin-bottom: 3rem;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 140px; }
+    .filter-group label {
+      font-size: 0.65rem; letter-spacing: 2px; color: var(--muted);
+      text-transform: uppercase;
+    }
+    .filter-group select,
+    .filter-group input {
+      background: var(--bg3); color: var(--text);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 0.6rem 0.9rem; font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      outline: none; transition: border-color 0.2s;
+    }
+    .filter-group select:focus,
+    .filter-group input:focus { border-color: var(--gold); }
+    .filter-group select option { background: var(--bg3); }
+    .filter-actions { display: flex; gap: 0.75rem; align-items: flex-end; }
+    .btn-filter {
+      background: linear-gradient(135deg, var(--gold3), var(--gold));
+      color: #000; border: none; border-radius: 6px;
+      padding: 0.6rem 1.4rem; font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 1px; cursor: pointer; white-space: nowrap;
+      transition: filter 0.2s;
+    }
+    .btn-filter:hover { filter: brightness(1.1); }
+    .btn-reset {
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 0.6rem 1.2rem; font-size: 0.8rem; cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-reset:hover { color: var(--text); border-color: var(--muted); }
+    .result-count {
+      font-size: 0.8rem; color: var(--muted); align-self: center; white-space: nowrap;
+    }
+
+    /* ═══════════════════ CAR GRID ══════════════════ */
+    .car-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 2rem;
+    }
+
+    /* ── Car Card ── */
+    .car-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      cursor: pointer;
+      display: flex; flex-direction: column;
+    }
+    .car-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.25);
+      border-color: rgba(201,168,76,0.3);
+    }
+    .car-image {
+      position: relative; height: 220px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .car-image-bg {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .car-brand-icon {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem; font-weight: 700;
+      opacity: 0.12; letter-spacing: -3px;
+      color: #fff; user-select: none;
+    }
+    .car-image-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(7,7,15,0.9) 100%);
+    }
+    .car-year-badge {
+      position: absolute; top: 1rem; left: 1rem;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid rgba(201,168,76,0.4);
+      color: var(--gold); font-size: 0.7rem; font-weight: 600;
+      padding: 3px 10px; border-radius: 3px; letter-spacing: 1px;
+    }
+    .car-status-badge {
+      position: absolute; top: 1rem; right: 1rem;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;
+      padding: 4px 10px; border-radius: 3px; text-transform: uppercase;
+    }
+    .status-available { background: rgba(62,207,142,0.15); color: var(--green); border: 1px solid rgba(62,207,142,0.3); }
+    .status-sold      { background: rgba(224,80,80,0.15);  color: var(--red);   border: 1px solid rgba(224,80,80,0.3); }
+    .car-spec-strip {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      display: flex; justify-content: space-around;
+      padding: 0.5rem 1rem 0.8rem;
+    }
+    .spec-pill {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .spec-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem; font-weight: 600; color: var(--gold2);
+    }
+    .spec-key {
+      font-size: 0.58rem; color: var(--muted);
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    /* Car Card Body */
+    .car-body { padding: 1.4rem; flex: 1; display: flex; flex-direction: column; }
+    .car-brand {
+      font-size: 0.65rem; letter-spacing: 3px; color: var(--gold);
+      text-transform: uppercase; margin-bottom: 0.3rem;
+    }
+    .car-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 600; color: var(--text);
+      line-height: 1.2; margin-bottom: 0.4rem;
+    }
+    .car-color-row {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem;
+    }
+    .color-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--gold2); flex-shrink: 0;
+    }
+    .car-mini-specs {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+    .mini-spec {
+      display: flex; align-items: center; gap: 0.35rem;
+      font-size: 0.75rem; color: var(--muted);
+    }
+    .mini-spec-icon { font-size: 0.9rem; }
+    .car-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: auto; padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .car-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 600; color: var(--gold);
+    }
+    .car-mileage { font-size: 0.75rem; color: var(--muted); }
+    .btn-view {
+      background: transparent; color: var(--gold);
+      border: 1px solid rgba(201,168,76,0.4); border-radius: 6px;
+      padding: 0.55rem 1.2rem; font-size: 0.75rem; font-weight: 500;
+      letter-spacing: 1px; cursor: pointer; text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+    .btn-view:hover {
+      background: rgba(201,168,76,0.1); border-color: var(--gold);
+      transform: translateX(3px);
+    }
+    /* Empty state */
+    .no-cars {
+      grid-column: 1/-1; text-align: center; padding: 5rem 2rem;
+      color: var(--muted);
+    }
+    .no-cars h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; color: var(--text); margin-bottom: 0.5rem;
+    }
+
+    /* ═══════════════════ FOOTER ══════════════════ */
+    footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 4rem 3rem 2rem;
+    }
+    .footer-inner {
+      max-width: 1400px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem;
+    }
+    .footer-brand .logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--gold); letter-spacing: 4px;
+      text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .footer-brand p { font-size: 0.85rem; color: var(--muted); line-height: 1.7; max-width: 280px; }
+    .footer-col h4 {
+      font-size: 0.7rem; letter-spacing: 3px; color: var(--gold);
+      text-transform: uppercase; margin-bottom: 1.2rem;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 0.6rem; }
+    .footer-col a {
+      color: var(--muted); text-decoration: none; font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom {
+      max-width: 1400px; margin: 3rem auto 0;
+      padding-top: 1.5rem; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-bottom p { font-size: 0.78rem; color: var(--muted); }
+    .tech-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tech-badge {
+      font-size: 0.65rem; padding: 3px 8px; border-radius: 3px;
+      border: 1px solid var(--border); color: var(--muted);
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+
+    /* ═══════════════════ TOAST ══════════════════ */
+    #toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); padding: 1rem 1.5rem;
+      border-radius: 10px; font-size: 0.875rem;
+      box-shadow: var(--shadow); max-width: 320px;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+    #toast.show {
+      opacity: 1; transform: translateY(0); pointer-events: auto;
+    }
+    #toast.gold  { border-color: rgba(201,168,76,0.5); }
+    #toast.error { border-color: rgba(224,80,80,0.5); }
+
+    /* ═══════════════════ RESPONSIVE ══════════════════ */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links, .nav-badge { display: none; }
+      .section { padding: 4rem 1.5rem; }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .stats-bar { gap: 2rem; padding: 1.5rem; }
+      .footer-inner { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ NAVBAR ══════════════════ -->
+<nav>
+  <a href="/" class="nav-logo">Prestige<span> Motors</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Showroom</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="/admin/login" style="color:var(--gold);border:1px solid rgba(201,168,76,0.4);padding:0.35rem 0.9rem;border-radius:6px;transition:background 0.2s;" onmouseover="this.style.background='rgba(201,168,76,0.12)'" onmouseout="this.style.background='transparent'">Admin</a></li>
+  </ul>
+  <span class="nav-badge">Est. 2019</span>
+</nav>
+
+<!-- ═══════════════════ HERO ══════════════════ -->
+<section class="hero" id="home">
+  <div class="hero-content">
+    <span class="hero-eyebrow">Certified Pre-Owned Luxury</span>
+    <h1>Drive <em>Extraordinary.</em><br>Own <em>Prestigious.</em></h1>
+    <p class="hero-sub">
+      Handpicked pre-owned supercars and grand tourers from the world's most
+      celebrated marques — every vehicle verified, serviced, and delivered with excellence.
+    </p>
+    <div class="hero-cta">
+      <a href="#showroom" class="btn-gold">Explore Showroom</a>
+      <a href="#about"    class="btn-outline">Our Promise</a>
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- ═══════════════════ STATS BAR ══════════════════ -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num" data-target="{{ total }}">0</div>
+    <div class="stat-label">Vehicles Listed</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" data-target="{{ available_count }}">0</div>
+    <div class="stat-label">Available Now</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" data-target="{{ brands|length }}">0</div>
+    <div class="stat-label">Prestige Brands</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" data-target="100">0</div>
+    <div class="stat-label">% Verified</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SHOWROOM ══════════════════ -->
+<div id="showroom">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-eyebrow">Our Collection</div>
+      <h2 class="section-title">The <span>Finest</span> Automobiles</h2>
+      <div class="divider"></div>
+    </div>
+
+    <!-- Filter Bar -->
+    <form class="filter-bar" id="filter-form" method="GET" action="/">
+      <div class="filter-group">
+        <label>Brand</label>
+        <select name="brand" id="f-brand">
+          <option value="">All Brands</option>
+          {% for b in brands %}
+          <option value="{{ b }}" {% if request.args.get('brand') == b %}selected{% endif %}>{{ b }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Fuel Type</label>
+        <select name="fuel_type" id="f-fuel">
+          <option value="">All Types</option>
+          {% for f in fuel_types %}
+          <option value="{{ f }}" {% if request.args.get('fuel_type') == f %}selected{% endif %}>{{ f }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Min Price (USD)</label>
+        <input type="number" name="min_price" placeholder="e.g. 100000"
+               value="{{ request.args.get('min_price', '') }}"/>
+      </div>
+      <div class="filter-group">
+        <label>Max Price (USD)</label>
+        <input type="number" name="max_price" placeholder="e.g. 500000"
+               value="{{ request.args.get('max_price', '') }}"/>
+      </div>
+      <div class="filter-group">
+        <label>Search</label>
+        <input type="text" name="search" placeholder="Model, colour…"
+               value="{{ request.args.get('search', '') }}"/>
+      </div>
+      <div class="filter-actions">
+        <button type="submit" class="btn-filter">Filter</button>
+        <a href="/" class="btn-reset">Reset</a>
+        <span class="result-count">{{ cars|length }} result{{ 's' if cars|length != 1 else '' }}</span>
+      </div>
+    </form>
+
+    <!-- Car Grid -->
+    <div class="car-grid" id="car-grid">
+      {% if cars %}
+        {% for car in cars %}
+        <div class="car-card" onclick="window.location='/car/{{ car.id }}'">
+          <!-- Image / Visual -->
+          <div class="car-image">
+            <div class="car-image-bg" style="background: {{ car.gradient }}">
+              <div class="car-brand-icon">{{ car.brand[0] }}</div>
+            </div>
+            <div class="car-image-overlay"></div>
+            <span class="car-year-badge">{{ car.year }}</span>
+            <span class="car-status-badge {% if car.available and not car.sold %}status-available{% else %}status-sold{% endif %}">
+              {% if car.available and not car.sold %}Available{% else %}Sold{% endif %}
+            </span>
+            <div class="car-spec-strip">
+              <div class="spec-pill">
+                <span class="spec-val">{{ car.power_hp }}<small style="font-size:0.6rem">hp</small></span>
+                <span class="spec-key">Power</span>
+              </div>
+              <div class="spec-pill">
+                <span class="spec-val">{{ car.acceleration_0_100 }}<small style="font-size:0.6rem">s</small></span>
+                <span class="spec-key">0–100</span>
+              </div>
+              <div class="spec-pill">
+                <span class="spec-val">{{ car.top_speed_kmh }}<small style="font-size:0.6rem">km/h</small></span>
+                <span class="spec-key">Top Speed</span>
+              </div>
+            </div>
+          </div>
+          <!-- Body -->
+          <div class="car-body">
+            <div class="car-brand">{{ car.brand }}</div>
+            <div class="car-name">{{ car.model }}</div>
+            <div class="car-color-row">
+              <div class="color-dot"></div>
+              {{ car.color }}
+            </div>
+            <div class="car-mini-specs">
+              <div class="mini-spec"><span class="mini-spec-icon">⛽</span>{{ car.fuel_type }}</div>
+              <div class="mini-spec"><span class="mini-spec-icon">⚙️</span>{{ car.transmission }}</div>
+              {% if car.engine %}<div class="mini-spec"><span class="mini-spec-icon">🔧</span>{{ car.engine }}</div>{% endif %}
+            </div>
+            <div class="car-footer">
+              <div>
+                <div class="car-price">{{ car.price | price }}</div>
+                <div class="car-mileage">{{ "{:,}".format(car.mileage) }} km</div>
+              </div>
+              <a href="/car/{{ car.id }}" class="btn-view" onclick="event.stopPropagation()">View →</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-cars">
+          <h3>No vehicles found</h3>
+          <p>Try adjusting your filters.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ ABOUT ══════════════════ -->
+<section id="about" style="background: var(--bg2); border-top: 1px solid var(--border);">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-eyebrow">Our Promise</div>
+      <h2 class="section-title">Why <span>Prestige Motors</span></h2>
+      <div class="divider"></div>
+    </div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); gap:2rem;">
+      {% for item in [
+        ('🔍', 'Rigorous Inspection', '200-point mechanical and cosmetic inspection on every vehicle before listing.'),
+        ('📜', 'Full Provenance',      'Complete service history, ownership records and accident checks provided.'),
+        ('💳', 'Secure Payments',      'PayPal-powered transactions with buyer protection on every purchase.'),
+        ('🚀', 'Global Delivery',      'White-glove enclosed transport to any destination worldwide.'),
+      ] %}
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:2rem;">
+        <div style="font-size:2.2rem; margin-bottom:1rem;">{{ item[0] }}</div>
+        <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:var(--gold); margin-bottom:0.5rem;">{{ item[1] }}</h3>
+        <p style="font-size:0.85rem; color:var(--muted); line-height:1.7;">{{ item[2] }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOOTER ══════════════════ -->
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo-text">Prestige Motors</div>
+      <p>London's premier destination for handpicked pre-owned supercars and luxury automobiles since 2019.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Showroom</h4>
+      <ul>
+        <li><a href="/">Browse Inventory</a></li>
+        <li><a href="/?brand=Ferrari">Ferrari</a></li>
+        <li><a href="/?brand=Lamborghini">Lamborghini</a></li>
+        <li><a href="/?brand=Porsche">Porsche</a></li>
+        <li><a href="/?brand=Rolls-Royce">Rolls-Royce</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#">Finance</a></li>
+        <li><a href="#">Trade-In</a></li>
+        <li><a href="#">Delivery</a></li>
+        <li><a href="#">Warranty</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="#">+44 20 7946 0958</a></li>
+        <li><a href="#">info@prestigemotors.com</a></li>
+        <li><a href="#">Mayfair, London W1K</a></li>
+        <li><a href="/health" target="_blank">System Health</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 Prestige Motors. All rights reserved. | DevOps Project — Karunya University</p>
+    <div class="tech-badges">
+      <span class="tech-badge">Flask</span>
+      <span class="tech-badge">Docker</span>
+      <span class="tech-badge">Kubernetes</span>
+      <span class="tech-badge">Jenkins</span>
+      <span class="tech-badge">Ansible</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+  // ── Counter animation for stat numbers ──────────────────────────────────
+  const counters = document.querySelectorAll('[data-target]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = +el.dataset.target;
+      let current = 0;
+      const step = Math.max(1, Math.ceil(target / 40));
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = current;
+        if (current >= target) clearInterval(timer);
+      }, 40);
+      observer.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => observer.observe(c));
+
+  // ── Toast helper ────────────────────────────────────────────────────────
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    setTimeout(() => { t.className = ''; }, 3200);
+  }
+
+  // ── Smooth-scroll hero CTA ───────────────────────────────────────────────
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // ── Navbar shadow on scroll ──────────────────────────────────────────────
+  window.addEventListener('scroll', () => {
+    document.querySelector('nav').style.boxShadow =
+      window.scrollY > 50 ? '0 4px 30px rgba(0,0,0,0.6)' : 'none';
+  });
+</script>
+</body>
+</html>

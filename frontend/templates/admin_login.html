@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Admin Login — Prestige Motors</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#07070f;color:#f0eeea;
+         min-height:100vh;display:flex;align-items:center;justify-content:center;
+         background-image:radial-gradient(ellipse at 60% 40%,rgba(201,168,76,0.05) 0%,transparent 60%)}
+    .card{background:#0f0f1e;border:1px solid #1e1e38;border-radius:16px;
+          padding:3rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.7)}
+    .logo{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;
+          color:#c9a84c;letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:0.3rem}
+    .logo span{color:#f0eeea;font-weight:300}
+    .subtitle{text-align:center;font-size:0.72rem;color:#7a7a9a;letter-spacing:3px;
+              text-transform:uppercase;margin-bottom:2.5rem}
+    .divider{width:40px;height:1px;background:linear-gradient(to right,#c9a84c,transparent);
+             margin:0 auto 2rem}
+    .form-group{margin-bottom:1.2rem}
+    .form-group label{display:block;font-size:0.7rem;color:#7a7a9a;letter-spacing:2px;
+                      text-transform:uppercase;margin-bottom:0.5rem}
+    .form-group input{width:100%;padding:0.85rem 1rem;background:#12122a;
+                      border:1px solid #1e1e38;border-radius:8px;color:#f0eeea;
+                      font-size:0.9rem;font-family:'Inter',sans-serif;outline:none;
+                      transition:border-color 0.2s}
+    .form-group input:focus{border-color:#c9a84c}
+    .btn-login{width:100%;padding:1rem;margin-top:0.5rem;
+               background:linear-gradient(135deg,#8a6a1a,#c9a84c);
+               color:#000;font-weight:700;font-size:0.85rem;
+               letter-spacing:2px;text-transform:uppercase;
+               border:none;border-radius:8px;cursor:pointer;transition:filter 0.2s}
+    .btn-login:hover{filter:brightness(1.1)}
+    .error{background:rgba(224,80,80,0.12);border:1px solid rgba(224,80,80,0.3);
+           color:#e05050;padding:0.8rem 1rem;border-radius:8px;
+           font-size:0.83rem;margin-bottom:1.2rem;text-align:center}
+    .back{display:block;text-align:center;margin-top:1.5rem;
+          font-size:0.78rem;color:#7a7a9a;text-decoration:none;transition:color 0.2s}
+    .back:hover{color:#c9a84c}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Prestige<span> Motors</span></div>
+    <div class="subtitle">Admin Portal</div>
+    <div class="divider"></div>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/admin/login">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="admin" autofocus required/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="btn-login">Sign In</button>
+    </form>
+
+    <a href="/" class="back">← Back to Showroom</a>
+  </div>
+</body>
+</html>

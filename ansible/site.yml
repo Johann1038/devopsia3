@@ -1,0 +1,97 @@
+---
+# ════════════════════════════════════════════════════════════════════════════
+# site.yml — Master Ansible Playbook
+# Provisions servers and deploys the Prestige Motors Luxury Car Showroom.
+#
+# Usage:
+#   ansible-playbook -i inventory.ini site.yml
+#   ansible-playbook -i inventory.ini site.yml --tags docker
+#   ansible-playbook -i inventory.ini site.yml --tags deploy
+# ════════════════════════════════════════════════════════════════════════════
+
+- name: Install and configure Docker on all nodes
+  hosts: all
+  become: true
+  gather_facts: true
+  tags: [docker]
+  roles:
+    - docker
+
+- name: Install kubectl on Kubernetes nodes
+  hosts: k8s_cluster
+  become: true
+  gather_facts: true
+  tags: [kubernetes]
+  roles:
+    - kubernetes
+
+- name: Install Jenkins CI/CD server
+  hosts: jenkins_server
+  become: true
+  gather_facts: true
+  tags: [jenkins]
+  roles:
+    - jenkins
+
+- name: Deploy Prestige Motors to Kubernetes
+  hosts: k8s_master
+  become: false
+  gather_facts: false
+  tags: [deploy]
+  vars:
+    dockerhub_image: "prestige-motors:local"
+    paypal_service_url: "https://payment-w1qr.onrender.com"
+    k8s_manifests_dir: "{{ playbook_dir }}/../k8s"
+  tasks:
+    - name: Copy Kubernetes manifests to the master node
+      copy:
+        src: "{{ k8s_manifests_dir }}/"
+        dest: "/tmp/k8s-manifests/"
+        mode: '0644'
+
+    - name: Apply Namespace manifest
+      command: kubectl apply -f /tmp/k8s-manifests/namespace.yaml
+      changed_when: true
+
+    - name: Apply Secret manifest
+      command: kubectl apply -f /tmp/k8s-manifests/secret.yaml
+      changed_when: true
+
+    - name: Apply Deployment manifest
+      command: kubectl apply -f /tmp/k8s-manifests/deployment.yaml
+      changed_when: true
+
+    - name: Apply Service manifest
+      command: kubectl apply -f /tmp/k8s-manifests/service.yaml
+      changed_when: true
+
+    - name: Apply HorizontalPodAutoscaler manifest
+      command: kubectl apply -f /tmp/k8s-manifests/hpa.yaml
+      changed_when: true
+
+    - name: Update container image to latest
+      command: >
+        kubectl set image deployment/prestige-motors
+        prestige-motors={{ dockerhub_image }}
+        -n luxury-cars
+      changed_when: true
+
+    - name: Inject PayPal service URL
+      command: >
+        kubectl set env deployment/prestige-motors
+        PAYPAL_SERVICE_URL={{ paypal_service_url }}
+        -n luxury-cars
+      changed_when: true
+
+    - name: Wait for rollout to complete
+      command: kubectl rollout status deployment/prestige-motors -n luxury-cars --timeout=180s
+      changed_when: false
+
+    - name: Show running pods
+      command: kubectl get pods -n luxury-cars -o wide
+      register: pods_output
+      changed_when: false
+
+    - name: Print pod status
+      debug:
+        var: pods_output.stdout_lines

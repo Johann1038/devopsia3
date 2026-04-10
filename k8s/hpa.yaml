@@ -1,0 +1,44 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: prestige-motors-hpa
+  namespace: luxury-cars
+  labels:
+    app: prestige-motors
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: prestige-motors
+
+  minReplicas: 3        # Always 3 for high availability
+  maxReplicas: 10       # Scale up to 10 under load
+
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60    # Scale out when avg CPU > 60%
+
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 70    # Scale out when avg memory > 70%
+
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60         # Add up to 2 pods/minute on spikes
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120        # Remove 1 pod at a time, carefully

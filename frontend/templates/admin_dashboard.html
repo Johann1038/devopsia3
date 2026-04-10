@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Admin Dashboard — Prestige Motors</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#07070f;--bg2:#0d0d1a;--bg3:#12122a;--card:#0f0f1e;
+          --gold:#c9a84c;--gold2:#e8d28a;--gold3:#8a6a1a;
+          --text:#f0eeea;--muted:#7a7a9a;--border:#1e1e38;
+          --red:#e05050;--green:#3ecf8e;--orange:#f59e0b;--radius:12px}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-thumb{background:var(--gold3);border-radius:3px}
+
+    /* ── Navbar ── */
+    nav{display:flex;align-items:center;justify-content:space-between;
+        padding:1rem 2rem;background:var(--bg2);border-bottom:1px solid var(--border);
+        position:sticky;top:0;z-index:100}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;
+              color:var(--gold);letter-spacing:3px;text-decoration:none}
+    .nav-logo span{color:var(--text);font-weight:300}
+    .nav-badge{font-size:0.65rem;background:rgba(201,168,76,0.15);
+               color:var(--gold);border:1px solid rgba(201,168,76,0.3);
+               padding:3px 12px;border-radius:3px;letter-spacing:2px;text-transform:uppercase}
+    .nav-right{display:flex;align-items:center;gap:1rem}
+    .btn-nav{font-size:0.75rem;color:var(--muted);text-decoration:none;
+             padding:0.4rem 0.9rem;border:1px solid var(--border);border-radius:6px;
+             transition:color 0.2s,border-color 0.2s}
+    .btn-nav:hover{color:var(--text);border-color:var(--muted)}
+    .btn-nav-danger{color:var(--red);border-color:rgba(224,80,80,0.3)}
+    .btn-nav-danger:hover{background:rgba(224,80,80,0.08)}
+
+    /* ── Layout ── */
+    .wrapper{max-width:1400px;margin:0 auto;padding:2rem}
+
+    /* ── Flash messages ── */
+    .flash{padding:0.85rem 1.2rem;border-radius:8px;margin-bottom:1.5rem;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem}
+    .flash-success{background:rgba(62,207,142,0.1);border:1px solid rgba(62,207,142,0.3);color:var(--green)}
+    .flash-error  {background:rgba(224,80,80,0.1);border:1px solid rgba(224,80,80,0.3);color:var(--red)}
+
+    /* ── Stats ── */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-bottom:2.5rem}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem}
+    .stat-label{font-size:0.65rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:0.5rem}
+    .stat-value{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:600;color:var(--gold);line-height:1}
+    .stat-sub{font-size:0.72rem;color:var(--muted);margin-top:0.3rem}
+
+    /* ── Section title ── */
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+    .section-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:var(--text)}
+    .section-title span{color:var(--gold);font-style:italic}
+    .btn-add-toggle{background:linear-gradient(135deg,var(--gold3),var(--gold));
+                    color:#000;font-weight:700;font-size:0.75rem;letter-spacing:1px;
+                    border:none;border-radius:6px;padding:0.55rem 1.2rem;cursor:pointer;
+                    transition:filter 0.2s}
+    .btn-add-toggle:hover{filter:brightness(1.1)}
+
+    /* ── Add Car Form ── */
+    .add-form-wrap{background:var(--card);border:1px solid var(--border);
+                   border-radius:var(--radius);padding:2rem;margin-bottom:2.5rem;
+                   display:none}
+    .add-form-wrap.open{display:block}
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+    .form-group{display:flex;flex-direction:column;gap:0.4rem}
+    .form-group label{font-size:0.65rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+    .form-group input,
+    .form-group select,
+    .form-group textarea{background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+                          color:var(--text);padding:0.65rem 0.9rem;font-size:0.85rem;
+                          font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;
+                          width:100%}
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus{border-color:var(--gold)}
+    .form-group select option{background:var(--bg3)}
+    .form-group.full{grid-column:1/-1}
+    .form-group textarea{resize:vertical;min-height:90px}
+    .form-actions{display:flex;gap:1rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+    .btn-submit{background:linear-gradient(135deg,var(--gold3),var(--gold));
+                color:#000;font-weight:700;font-size:0.82rem;letter-spacing:1px;
+                border:none;border-radius:8px;padding:0.75rem 2rem;cursor:pointer;transition:filter 0.2s}
+    .btn-submit:hover{filter:brightness(1.1)}
+    .btn-cancel-form{background:transparent;color:var(--muted);
+                     border:1px solid var(--border);border-radius:8px;
+                     padding:0.75rem 1.5rem;font-size:0.82rem;cursor:pointer;transition:color 0.2s}
+    .btn-cancel-form:hover{color:var(--text)}
+
+    /* ── Cars Table ── */
+    .table-wrap{background:var(--card);border:1px solid var(--border);
+                border-radius:var(--radius);overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    thead tr{background:var(--bg2)}
+    th{padding:0.9rem 1rem;text-align:left;font-size:0.65rem;color:var(--muted);
+       letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+    td{padding:0.85rem 1rem;border-top:1px solid var(--border);font-size:0.83rem;vertical-align:middle}
+    tr:hover td{background:rgba(255,255,255,0.02)}
+    .brand-cell{display:flex;align-items:center;gap:0.6rem}
+    .brand-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .car-name{font-weight:500;color:var(--text)}
+    .car-brand-label{font-size:0.72rem;color:var(--gold)}
+    .price-cell{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold)}
+    .badge{font-size:0.65rem;font-weight:700;padding:3px 10px;border-radius:3px;
+           letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+    .badge-available{background:rgba(62,207,142,0.12);color:var(--green);border:1px solid rgba(62,207,142,0.3)}
+    .badge-hidden   {background:rgba(245,158,11,0.12);color:var(--orange);border:1px solid rgba(245,158,11,0.3)}
+    .badge-sold     {background:rgba(224,80,80,0.12); color:var(--red);  border:1px solid rgba(224,80,80,0.3)}
+    .actions-cell{display:flex;gap:0.5rem;flex-wrap:wrap}
+    .btn-sm{font-size:0.7rem;padding:0.35rem 0.8rem;border-radius:5px;
+            border:none;cursor:pointer;font-weight:600;letter-spacing:0.5px;transition:filter 0.15s}
+    .btn-sm:hover{filter:brightness(1.15)}
+    .btn-view {background:rgba(201,168,76,0.15);color:var(--gold);text-decoration:none;display:inline-block}
+    .btn-toggle-show{background:rgba(62,207,142,0.15);color:var(--green)}
+    .btn-toggle-hide{background:rgba(245,158,11,0.15);color:var(--orange)}
+    .btn-delete {background:rgba(224,80,80,0.15);color:var(--red)}
+    .empty-row td{text-align:center;padding:3rem;color:var(--muted)}
+
+    @media(max-width:900px){
+      .stats-grid{grid-template-columns:1fr 1fr}
+      nav{padding:1rem}
+      table thead{display:none}
+      td{display:block;border:none;padding:0.4rem 1rem}
+      td::before{content:attr(data-label)" ";font-size:0.65rem;color:var(--muted);
+                 text-transform:uppercase;letter-spacing:1px;display:block}
+      tr{border-top:1px solid var(--border);display:block;padding:0.5rem 0}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <a href="/" class="nav-logo">Prestige<span> Motors</span></a>
+  <div class="nav-right">
+    <span class="nav-badge">Admin Panel</span>
+    <a href="/" class="btn-nav" target="_blank">View Showroom</a>
+    <a href="/admin/logout" class="btn-nav btn-nav-danger">Logout</a>
+  </div>
+</nav>
+
+<div class="wrapper">
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}">
+      {{ '✓' if category == 'success' else '✕' }} {{ message }}
+    </div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Vehicles</div>
+      <div class="stat-value">{{ stats.total }}</div>
+      <div class="stat-sub">In inventory</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Available</div>
+      <div class="stat-value" style="color:var(--green)">{{ stats.available }}</div>
+      <div class="stat-sub">Visible to buyers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Sold</div>
+      <div class="stat-value" style="color:var(--red)">{{ stats.sold }}</div>
+      <div class="stat-sub">Completed sales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Brands</div>
+      <div class="stat-value">{{ stats.brands }}</div>
+      <div class="stat-sub">Marques listed</div>
+    </div>
+  </div>
+
+  <!-- Add Vehicle -->
+  <div class="section-head">
+    <h2 class="section-title">Vehicle <span>Inventory</span></h2>
+    <button class="btn-add-toggle" onclick="toggleForm()">+ Add New Vehicle</button>
+  </div>
+
+  <!-- Add Form -->
+  <div class="add-form-wrap" id="add-form">
+    <form method="POST" action="/admin/cars/add">
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Brand *</label>
+          <select name="brand" required>
+            <option value="">Select brand</option>
+            {% for b in brands %}
+            <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Model *</label>
+          <input type="text" name="model" placeholder="e.g. 911 Turbo S" required/>
+        </div>
+
+        <div class="form-group">
+          <label>Year *</label>
+          <input type="number" name="year" placeholder="2024" min="1990" max="2030" required/>
+        </div>
+
+        <div class="form-group">
+          <label>Price (USD) *</label>
+          <input type="number" name="price" placeholder="250000" min="1" step="1000" required/>
+        </div>
+
+        <div class="form-group">
+          <label>Mileage (km)</label>
+          <input type="number" name="mileage" placeholder="5000" min="0"/>
+        </div>
+
+        <div class="form-group">
+          <label>Fuel Type *</label>
+          <select name="fuel_type" required>
+            <option value="">Select type</option>
+            <option>Petrol</option>
+            <option>Diesel</option>
+            <option>Electric</option>
+            <option>Hybrid</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Transmission *</label>
+          <select name="transmission" required>
+            <option value="">Select</option>
+            <option>Automatic</option>
+            <option>Manual</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Colour *</label>
+          <input type="text" name="color" placeholder="e.g. Rosso Corsa" required/>
+        </div>
+
+        <div class="form-group">
+          <label>Engine</label>
+          <input type="text" name="engine" placeholder="e.g. 4.0L V8 Twin-Turbo"/>
+        </div>
+
+        <div class="form-group">
+          <label>Power (hp)</label>
+          <input type="number" name="power_hp" placeholder="650" min="0"/>
+        </div>
+
+        <div class="form-group">
+          <label>Torque (Nm)</label>
+          <input type="number" name="torque_nm" placeholder="800" min="0"/>
+        </div>
+
+        <div class="form-group">
+          <label>0–100 km/h (s)</label>
+          <input type="number" name="acceleration_0_100" placeholder="3.5" step="0.1" min="0"/>
+        </div>
+
+        <div class="form-group">
+          <label>Top Speed (km/h)</label>
+          <input type="number" name="top_speed_kmh" placeholder="330" min="0"/>
+        </div>
+
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea name="description" placeholder="Describe the vehicle history, condition, and highlights…"></textarea>
+        </div>
+
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">Add to Showroom</button>
+        <button type="button" class="btn-cancel-form" onclick="toggleForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Cars Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Vehicle</th>
+          <th>Year</th>
+          <th>Price</th>
+          <th>Mileage</th>
+          <th>Fuel</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if cars %}
+          {% for car in cars %}
+          <tr>
+            <td data-label="Vehicle">
+              <div class="brand-cell">
+                <div class="brand-dot" style="background:{{ car.gradient.split(',')[-1].replace(')','').strip() }}"></div>
+                <div>
+                  <div class="car-brand-label">{{ car.brand }}</div>
+                  <div class="car-name">{{ car.model }}</div>
+                </div>
+              </div>
+            </td>
+            <td data-label="Year">{{ car.year }}</td>
+            <td data-label="Price"><span class="price-cell">{{ car.price | price }}</span></td>
+            <td data-label="Mileage">{{ car.mileage | commas }} km</td>
+            <td data-label="Fuel">{{ car.fuel_type }}</td>
+            <td data-label="Status">
+              {% if car.sold %}
+                <span class="badge badge-sold">Sold</span>
+              {% elif car.available %}
+                <span class="badge badge-available">Available</span>
+              {% else %}
+                <span class="badge badge-hidden">Hidden</span>
+              {% endif %}
+            </td>
+            <td data-label="Actions">
+              <div class="actions-cell">
+                <a href="/car/{{ car.id }}" class="btn-sm btn-view" target="_blank">View</a>
+
+                {% if not car.sold %}
+                <form method="POST" action="/admin/cars/{{ car.id }}/toggle" style="display:inline">
+                  <button type="submit" class="btn-sm {{ 'btn-toggle-hide' if car.available else 'btn-toggle-show' }}">
+                    {{ 'Hide' if car.available else 'Show' }}
+                  </button>
+                </form>
+                {% endif %}
+
+                <form method="POST" action="/admin/cars/{{ car.id }}/delete" style="display:inline"
+                      onsubmit="return confirm('Remove {{ car.brand }} {{ car.model }} from showroom?')">
+                  <button type="submit" class="btn-sm btn-delete">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr class="empty-row"><td colspan="7">No vehicles in inventory. Add one above.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  function toggleForm() {
+    const form = document.getElementById('add-form');
+    form.classList.toggle('open');
+    if (form.classList.contains('open')) {
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+  // Auto-open form if there was a validation error
+  {% if get_flashed_messages() | selectattr('0', 'equalto', 'error') | list %}
+  toggleForm();
+  {% endif %}
+</script>
+
+</body>
+</html>

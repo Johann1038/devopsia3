@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  prestige-motors:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: prestige-motors:local
+    container_name: prestige-motors
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - PORT=5000
+      - APP_VERSION=1.0.0
+      # Replace with your actual Render URL
+      - PAYPAL_SERVICE_URL=https://payment-w1qr.onrender.com
+      - API_KEY=prod-secret-abc123
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=prestige@admin2024
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout:  5s
+      retries:  3
+      start_period: 15s
+    networks:
+      - prestige-net
+
+  # ── Test runner (runs pytest and exits) ───────────────────────────────────
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    image: prestige-motors:test
+    container_name: prestige-test
+    working_dir: /build
+    volumes:
+      - .:/build
+    command: >
+      sh -c "/opt/venv/bin/pytest backend/tests/ -v --tb=short"
+    environment:
+      - FLASK_ENV=testing
+    networks:
+      - prestige-net
+    profiles:
+      - test
+
+networks:
+  prestige-net:
+    driver: bridge

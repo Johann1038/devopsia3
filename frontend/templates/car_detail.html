@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ car.year }} {{ car.brand }} {{ car.model }} — Prestige Motors</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #07070f; --bg2: #0d0d1a; --bg3: #12122a; --card: #0f0f1e;
+      --gold: #c9a84c; --gold2: #e8d28a; --gold3: #8a6a1a;
+      --text: #f0eeea; --muted: #7a7a9a; --border: #1e1e38;
+      --red: #e05050; --green: #3ecf8e; --radius: 14px;
+      --shadow: 0 8px 40px rgba(0,0,0,0.7);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--gold3); border-radius: 3px; }
+
+    /* ── Navbar ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: rgba(7,7,15,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.6rem;
+      font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gold); text-decoration: none;
+    }
+    .nav-logo span { color: var(--text); font-weight: 300; }
+    .breadcrumb {
+      font-size: 0.75rem; color: var(--muted); display: flex; gap: 0.5rem; align-items: center;
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--gold); }
+    .breadcrumb-sep { color: var(--border); }
+
+    /* ── Hero Banner ── */
+    .car-hero {
+      position: relative; height: 420px; overflow: hidden;
+      display: flex; align-items: flex-end;
+    }
+    .car-hero-bg {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .car-hero-letter {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: min(28vw, 340px); font-weight: 700;
+      opacity: 0.07; color: #fff; user-select: none;
+      letter-spacing: -10px;
+    }
+    .car-hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(7,7,15,0.1) 0%, rgba(7,7,15,0.85) 100%);
+    }
+    .car-hero-content {
+      position: relative; z-index: 1;
+      padding: 2.5rem 3rem; width: 100%;
+      display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;
+    }
+    .car-hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 300;
+      line-height: 1.1; color: var(--text);
+    }
+    .car-hero-title strong { font-weight: 700; color: var(--gold); }
+    .car-hero-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem; font-weight: 600; color: var(--gold);
+      text-align: right;
+    }
+    .car-hero-price small {
+      display: block; font-family: 'Inter', sans-serif;
+      font-size: 0.75rem; color: var(--muted); font-weight: 400; letter-spacing: 1px;
+    }
+    .hero-status-badge {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 1px;
+      padding: 5px 14px; border-radius: 3px; text-transform: uppercase;
+      margin-bottom: 0.5rem; display: inline-block;
+    }
+    .status-available { background: rgba(62,207,142,0.15); color: var(--green); border: 1px solid rgba(62,207,142,0.3); }
+    .status-sold      { background: rgba(224,80,80,0.15);  color: var(--red);   border: 1px solid rgba(224,80,80,0.3); }
+
+    /* ── Main Layout ── */
+    .detail-wrapper { max-width: 1300px; margin: 0 auto; padding: 3rem; display: grid; grid-template-columns: 1fr 380px; gap: 3rem; }
+
+    /* ── Left: Specs ── */
+    .specs-panel h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 300; color: var(--text); margin-bottom: 1.5rem;
+    }
+    .specs-panel h2 span { color: var(--gold); }
+    .description-block {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.5rem; margin-bottom: 2rem;
+      font-size: 0.9rem; color: #c0bdb8; line-height: 1.85;
+    }
+    .specs-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .spec-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+      transition: background 0.15s;
+    }
+    .spec-row:hover { background: var(--bg3); }
+    .spec-row:nth-child(odd) { background: var(--bg2); }
+    .spec-row:nth-child(odd):hover { background: var(--bg3); }
+    .spec-row:last-child, .spec-row:nth-last-child(2) { border-bottom: none; }
+    .spec-row-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+    .spec-row-value { font-size: 0.9rem; color: var(--gold2); font-weight: 500; text-align: right; }
+
+    /* Performance bar */
+    .perf-section { margin-bottom: 2rem; }
+    .perf-section h3 {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.3rem;
+      color: var(--text); margin-bottom: 1.2rem;
+    }
+    .perf-bar-group { margin-bottom: 1rem; }
+    .perf-bar-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.75rem; color: var(--muted); margin-bottom: 0.4rem;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .perf-bar-track {
+      height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;
+    }
+    .perf-bar-fill {
+      height: 100%; background: linear-gradient(to right, var(--gold3), var(--gold));
+      border-radius: 2px; transition: width 1s ease;
+      width: 0;
+    }
+
+    /* ── Right: Purchase Panel ── */
+    .purchase-panel {
+      position: sticky; top: 90px; align-self: start;
+    }
+    .panel-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem;
+      margin-bottom: 1.2rem;
+    }
+    .panel-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.8rem; font-weight: 600; color: var(--gold);
+      margin-bottom: 0.3rem;
+    }
+    .panel-mileage { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .panel-row {
+      display: flex; justify-content: space-between;
+      padding: 0.6rem 0; border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+    .panel-row:last-of-type { border-bottom: none; }
+    .panel-row-key { color: var(--muted); }
+    .panel-row-val { color: var(--text); font-weight: 500; }
+    .btn-buy {
+      width: 100%; padding: 1.1rem;
+      background: linear-gradient(135deg, var(--gold3), var(--gold));
+      color: #000; font-weight: 700; font-size: 0.9rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      border: none; border-radius: 8px; cursor: pointer;
+      margin-top: 1.5rem; transition: filter 0.2s, transform 0.2s;
+    }
+    .btn-buy:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-2px); }
+    .btn-buy:disabled { opacity: 0.4; cursor: not-allowed; filter: none; transform: none; }
+    .btn-back {
+      width: 100%; padding: 0.85rem;
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 8px;
+      font-size: 0.8rem; cursor: pointer; letter-spacing: 1px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-back:hover { color: var(--text); border-color: var(--muted); }
+    .paypal-note {
+      display: flex; align-items: center; gap: 0.5rem; justify-content: center;
+      margin-top: 1rem; font-size: 0.72rem; color: var(--muted);
+    }
+    .paypal-note span { font-size: 1rem; }
+
+    /* Purchase modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2.5rem;
+      max-width: 460px; width: 90%; box-shadow: var(--shadow);
+    }
+    .modal h2 {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.8rem;
+      color: var(--gold); margin-bottom: 0.3rem;
+    }
+    .modal p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.72rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .form-group input {
+      width: 100%; padding: 0.75rem 1rem;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 0.9rem;
+      font-family: 'Inter', sans-serif; outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: var(--gold); }
+    .modal-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+    .modal-submit {
+      flex: 1; padding: 0.9rem;
+      background: linear-gradient(135deg, var(--gold3), var(--gold));
+      color: #000; font-weight: 700; border: none; border-radius: 8px;
+      font-size: 0.85rem; letter-spacing: 1px; cursor: pointer;
+      transition: filter 0.2s;
+    }
+    .modal-submit:hover { filter: brightness(1.1); }
+    .modal-cancel {
+      padding: 0.9rem 1.5rem;
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 8px;
+      font-size: 0.85rem; cursor: pointer;
+      transition: color 0.2s;
+    }
+    .modal-cancel:hover { color: var(--text); }
+
+    /* ── Similar Cars ── */
+    .similar-section { padding: 4rem 3rem; max-width: 1300px; margin: 0 auto; }
+    .section-eyebrow { font-size: 0.7rem; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 0.5rem; }
+    .section-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; color: var(--text); margin-bottom: 2rem; }
+    .section-title span { color: var(--gold); font-style: italic; }
+    .similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 1.5rem; }
+    .similar-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; cursor: pointer; text-decoration: none; display: block;
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    }
+    .similar-card:hover { transform: translateY(-6px); box-shadow: 0 16px 50px rgba(0,0,0,0.5); border-color: rgba(201,168,76,0.25); }
+    .similar-thumb {
+      height: 160px; display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .similar-thumb-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 50%, rgba(7,7,15,0.8) 100%); }
+    .similar-thumb-letter {
+      font-family: 'Cormorant Garamond', serif; font-size: 6rem; font-weight: 700;
+      opacity: 0.1; color: #fff; z-index: 0;
+    }
+    .similar-body { padding: 1rem 1.2rem; }
+    .similar-brand { font-size: 0.65rem; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
+    .similar-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--text); margin-bottom: 0.5rem; }
+    .similar-price { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--gold); }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); padding: 1rem 1.5rem;
+      border-radius: 10px; font-size: 0.875rem; box-shadow: var(--shadow);
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.3s, transform 0.3s; pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    #toast.gold  { border-color: rgba(201,168,76,0.5); }
+    #toast.error { border-color: rgba(224,80,80,0.5); }
+
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .detail-wrapper { grid-template-columns: 1fr; padding: 1.5rem; }
+      .purchase-panel { position: static; }
+      .car-hero { height: 280px; }
+      .car-hero-content { padding: 1.5rem; }
+      .specs-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <a href="/" class="nav-logo">Prestige<span> Motors</span></a>
+  <div class="breadcrumb">
+    <a href="/">Showroom</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>{{ car.brand }}</span>
+    <span class="breadcrumb-sep">›</span>
+    <span>{{ car.model }}</span>
+  </div>
+</nav>
+
+<!-- Hero Banner -->
+<div class="car-hero">
+  <div class="car-hero-bg" style="background: {{ car.gradient }}">
+    <div class="car-hero-letter">{{ car.brand }}</div>
+  </div>
+  <div class="car-hero-overlay"></div>
+  <div class="car-hero-content">
+    <div>
+      <span class="hero-status-badge {% if car.available and not car.sold %}status-available{% else %}status-sold{% endif %}">
+        {% if car.available and not car.sold %}Available{% else %}Sold{% endif %}
+      </span>
+      <div class="car-hero-title">
+        {{ car.year }}<br>
+        <strong>{{ car.brand }} {{ car.model }}</strong>
+      </div>
+    </div>
+    <div class="car-hero-price">
+      {{ car.price | price }}
+      <small>Asking Price</small>
+    </div>
+  </div>
+</div>
+
+<!-- Main Detail -->
+<div class="detail-wrapper">
+
+  <!-- Left: Specs & Description -->
+  <div class="specs-panel">
+    <h2>Vehicle <span>Overview</span></h2>
+
+    <div class="description-block">{{ car.description }}</div>
+
+    <!-- Core specs table (2-column grid) -->
+    <div class="specs-grid">
+      {% set spec_pairs = [
+        ('Brand',         car.brand),
+        ('Model',         car.model),
+        ('Year',          car.year),
+        ('Colour',        car.color),
+        ('Engine',        car.engine if car.engine else '—'),
+        ('Power',         (car.power_hp | string + ' hp') if car.power_hp else '—'),
+        ('Torque',        (car.torque_nm | string + ' Nm') if car.torque_nm else '—'),
+        ('0–100 km/h',    (car.acceleration_0_100 | string + ' s') if car.acceleration_0_100 else '—'),
+        ('Top Speed',     (car.top_speed_kmh | string + ' km/h') if car.top_speed_kmh else '—'),
+        ('Fuel Type',     car.fuel_type),
+        ('Transmission',  car.transmission),
+        ('Mileage',       '{:,} km'.format(car.mileage)),
+      ] %}
+      {% for label, value in spec_pairs %}
+      <div class="spec-row">
+        <span class="spec-row-label">{{ label }}</span>
+        <span class="spec-row-value">{{ value }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Performance bars -->
+    <div class="perf-section">
+      <h3>Performance at a Glance</h3>
+      {% set perf_items = [
+        ('Power (hp)',    car.power_hp,     1000),
+        ('Top Speed',     car.top_speed_kmh, 400),
+        ('Torque (Nm)',   car.torque_nm,     1200),
+      ] %}
+      {% for label, val, max_val in perf_items %}
+      <div class="perf-bar-group">
+        <div class="perf-bar-label">
+          <span>{{ label }}</span>
+          <span>{{ val }}</span>
+        </div>
+        <div class="perf-bar-track">
+          <div class="perf-bar-fill" data-pct="{{ [(val / max_val * 100), 100]|min | int }}"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Right: Purchase Panel -->
+  <div class="purchase-panel">
+    <div class="panel-card">
+      <div class="panel-price">{{ car.price | price }}</div>
+      <div class="panel-mileage">{{ '{:,}'.format(car.mileage) }} km · {{ car.year }}</div>
+
+      <div class="panel-row">
+        <span class="panel-row-key">Brand</span>
+        <span class="panel-row-val">{{ car.brand }}</span>
+      </div>
+      <div class="panel-row">
+        <span class="panel-row-key">Model</span>
+        <span class="panel-row-val">{{ car.model }}</span>
+      </div>
+      <div class="panel-row">
+        <span class="panel-row-key">Colour</span>
+        <span class="panel-row-val">{{ car.color }}</span>
+      </div>
+      <div class="panel-row">
+        <span class="panel-row-key">Fuel Type</span>
+        <span class="panel-row-val">{{ car.fuel_type }}</span>
+      </div>
+      <div class="panel-row">
+        <span class="panel-row-key">Status</span>
+        <span class="panel-row-val" style="color:{% if car.available and not car.sold %}var(--green){% else %}var(--red){% endif %}">
+          {% if car.available and not car.sold %}Available{% else %}Sold{% endif %}
+        </span>
+      </div>
+
+      <button
+        class="btn-buy"
+        id="buy-btn"
+        {% if not car.available or car.sold %}disabled{% endif %}
+        onclick="openModal()"
+      >
+        {% if car.available and not car.sold %}Purchase via PayPal{% else %}Vehicle Sold{% endif %}
+      </button>
+
+      <div class="paypal-note">
+        <span>🔒</span> Secured by PayPal · Buyer Protection Included
+      </div>
+    </div>
+
+    <button class="btn-back" onclick="history.back()">← Back to Showroom</button>
+  </div>
+</div>
+
+<!-- Similar Cars -->
+{% if similar %}
+<div style="background: var(--bg2); border-top: 1px solid var(--border);">
+  <div class="similar-section">
+    <div class="section-eyebrow">More from {{ car.brand }}</div>
+    <div class="section-title">Similar <span>Vehicles</span></div>
+    <div class="similar-grid">
+      {% for s in similar %}
+      <a href="/car/{{ s.id }}" class="similar-card">
+        <div class="similar-thumb" style="background: {{ s.gradient }}">
+          <div class="similar-thumb-letter">{{ s.brand[0] }}</div>
+          <div class="similar-thumb-overlay"></div>
+        </div>
+        <div class="similar-body">
+          <div class="similar-brand">{{ s.brand }}</div>
+          <div class="similar-name">{{ s.model }}</div>
+          <div class="similar-price">{{ s.price | price }}</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Purchase Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2>Complete Purchase</h2>
+    <p>You are about to initiate a PayPal payment for the<br>
+       <strong style="color:var(--text)">{{ car.year }} {{ car.brand }} {{ car.model }}</strong>
+       — {{ car.price | price }}</p>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="buyer-name" placeholder="John Smith"/>
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="buyer-email" placeholder="john@example.com"/>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-submit" id="confirm-btn" onclick="confirmPurchase()">
+        Proceed to PayPal
+      </button>
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+  const CAR_ID = "{{ car.id }}";
+
+  // ── Performance bars animate on load ──
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.perf-bar-fill').forEach(bar => {
+      setTimeout(() => { bar.style.width = bar.dataset.pct + '%'; }, 300);
+    });
+  });
+
+  // ── Modal ──
+  function openModal()  { document.getElementById('modal').classList.add('open'); }
+  function closeModal() { document.getElementById('modal').classList.remove('open'); }
+  document.getElementById('modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal')) closeModal();
+  });
+
+  // ── Toast ──
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    setTimeout(() => { t.className = ''; }, 3500);
+  }
+
+  // ── Purchase ──
+  async function confirmPurchase() {
+    const name  = document.getElementById('buyer-name').value.trim();
+    const email = document.getElementById('buyer-email').value.trim();
+    if (!name || !email) {
+      showToast('Please enter your name and email.', 'error'); return;
+    }
+    const btn = document.getElementById('confirm-btn');
+    btn.textContent = 'Processing…';
+    btn.disabled = true;
+    try {
+      const resp = await fetch(`/api/cars/${CAR_ID}/purchase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ buyer_name: name, buyer_email: email }),
+      });
+      const data = await resp.json();
+      closeModal();
+      if (resp.ok) {
+        const status = data.payment?.status || 'pending';
+        showToast(`Payment ${status}. Order reference: ${data.payment?.payment_id || 'N/A'}`, 'gold');
+        if (status === 'approved') {
+          document.getElementById('buy-btn').disabled = true;
+          document.getElementById('buy-btn').textContent = 'Vehicle Sold';
+        }
+      } else {
+        showToast(data.error || 'Payment failed.', 'error');
+      }
+    } catch {
+      showToast('Network error — please try again.', 'error');
+    } finally {
+      btn.textContent = 'Proceed to PayPal';
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>

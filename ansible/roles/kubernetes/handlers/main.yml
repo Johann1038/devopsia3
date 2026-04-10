@@ -1,0 +1,8 @@
+---
+# Handlers for the kubernetes role
+
+- name: Verify kubectl
+  command: kubectl version --client --short
+  register: kubectl_check
+  changed_when: false
+  listen: Verify kubectl
