@@ -42,7 +42,7 @@ jobs:
           docker images ${{ env.IMAGE_NAME }}
 
       - name: Save image as artifact
-        run: docker save ${{ env.IMAGE_NAME }}:${{ github.run_number }} | gzip > image.tar.gz
+        run: docker save ${{ env.IMAGE_NAME }}:${{ github.run_number }} ${{ env.IMAGE_NAME }}:latest | gzip > image.tar.gz
 
       - name: Upload image artifact
         uses: actions/upload-artifact@v4
