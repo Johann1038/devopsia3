@@ -313,9 +313,13 @@ def purchase_car(car_id):
     if car.get("sold"):      return jsonify({"error":"This car has already been sold."}), 409
     if not car.get("available"): return jsonify({"error":"This car is not available."}), 409
     data    = request.get_json(force=True, silent=True) or {}
-    payload = {"item_id":car_id,"item_name":f"{car['year']} {car['brand']} {car['model']}",
-               "amount":car["price"],"currency":"USD",
-               "buyer_name":data.get("buyer_name",""),"buyer_email":data.get("buyer_email","")}
+    payload = {
+        "items": [{"id": car_id, "name": f"{car['year']} {car['brand']} {car['model']}",
+                   "quantity": 1, "unit_amount": str(float(car["price"]))}],
+        "currency": "USD",
+        "buyer_name": data.get("buyer_name", ""),
+        "buyer_email": data.get("buyer_email", "")
+    }
     try:
         resp = requests.post(f"{PAYPAL_SERVICE_URL}/orders",
                              json=payload, headers=_payment_headers(), timeout=10)
