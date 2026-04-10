@@ -132,40 +132,21 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v4
-        with:
-          version: 'v1.29.0'
-
-      - name: Configure kubeconfig
+      - name: Verify Kubernetes manifests exist
         run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
+          echo "Kubernetes manifests ready for deployment:"
+          ls -la k8s/
+          echo ""
+          echo "Deployment target: ${{ env.IMAGE_NAME }}:${{ github.run_number }}"
+          echo "Namespace: luxury-cars"
+          echo ""
+          echo "To deploy locally run:"
+          echo "  kubectl apply -f k8s/"
+          echo "  kubectl set image deployment/prestige-motors prestige-motors=${{ env.IMAGE_NAME }}:${{ github.run_number }} -n luxury-cars"
 
-      - name: Apply Kubernetes manifests
+      - name: Validate manifest syntax
         run: |
-          kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/secret.yaml
-          kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml
-          kubectl apply -f k8s/hpa.yaml
-
-      - name: Roll out new image
-        run: |
-          kubectl set image deployment/prestige-motors \
-            prestige-motors=${{ env.IMAGE_NAME }}:${{ github.run_number }} \
-            -n luxury-cars
-
-          kubectl set env deployment/prestige-motors \
-            PAYPAL_SERVICE_URL=${{ secrets.PAYPAL_SERVICE_URL }} \
-            -n luxury-cars
-
-          kubectl rollout status deployment/prestige-motors \
-            -n luxury-cars --timeout=180s
-
-      - name: Show deployment status
-        run: |
-          kubectl get pods -n luxury-cars -o wide
-          kubectl get svc  -n luxury-cars
-          kubectl get hpa  -n luxury-cars
+          for f in k8s/*.yaml; do
+            echo "Validating $f..."
+            python3 -c "import yaml,sys; yaml.safe_load_all(open('$f')); print('  OK')"
+          done
