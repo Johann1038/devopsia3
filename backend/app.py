@@ -317,12 +317,12 @@ def purchase_car(car_id):
                "amount":car["price"],"currency":"USD",
                "buyer_name":data.get("buyer_name",""),"buyer_email":data.get("buyer_email","")}
     try:
-        resp = requests.post(f"{PAYPAL_SERVICE_URL}/create-payment",
+        resp = requests.post(f"{PAYPAL_SERVICE_URL}/orders",
                              json=payload, headers=_payment_headers(), timeout=10)
         resp.raise_for_status()
         pd = resp.json()
-        if pd.get("status") == "approved":
-            car.update({"sold":True,"available":False,"payment_id":pd.get("payment_id"),
+        if pd.get("status") in ("approved", "COMPLETED"):
+            car.update({"sold":True,"available":False,"payment_id":pd.get("id") or pd.get("payment_id"),
                         "updated_at":datetime.utcnow().isoformat()})
         return jsonify({"car":car,"payment":pd}), resp.status_code
     except requests.exceptions.ConnectionError:
@@ -335,7 +335,7 @@ def purchase_car(car_id):
 @app.route("/api/payment/status/<string:payment_id>")
 def payment_status(payment_id):
     try:
-        resp = requests.get(f"{PAYPAL_SERVICE_URL}/payment-status/{payment_id}",
+        resp = requests.get(f"{PAYPAL_SERVICE_URL}/orders/{payment_id}",
                             headers=_payment_headers(), timeout=10)
         resp.raise_for_status()
         return jsonify(resp.json()), resp.status_code
