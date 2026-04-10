@@ -521,11 +521,11 @@
       const data = await resp.json();
       closeModal();
       if (resp.ok) {
-        const status = data.payment?.status || 'pending';
-        showToast(`Payment ${status}. Order reference: ${data.payment?.payment_id || 'N/A'}`, 'gold');
-        if (status === 'approved') {
-          document.getElementById('buy-btn').disabled = true;
-          document.getElementById('buy-btn').textContent = 'Vehicle Sold';
+        if (data.checkout_url) {
+          showToast('Redirecting to PayPal…', 'gold');
+          setTimeout(() => { window.location.href = data.checkout_url; }, 800);
+        } else {
+          showToast('Payment session created.', 'gold');
         }
       } else {
         showToast(data.error || 'Payment failed.', 'error');

@@ -312,23 +312,21 @@ def purchase_car(car_id):
     car = _car_or_404(car_id)
     if car.get("sold"):      return jsonify({"error":"This car has already been sold."}), 409
     if not car.get("available"): return jsonify({"error":"This car is not available."}), 409
-    data    = request.get_json(force=True, silent=True) or {}
+    data        = request.get_json(force=True, silent=True) or {}
+    callback    = request.host_url.rstrip("/") + f"/car/{car_id}"
     payload = {
-        "items": [{"id": car_id, "name": f"{car['year']} {car['brand']} {car['model']}",
-                   "quantity": 1, "unit_amount": str(float(car["price"]))}],
+        "items": [{"name": f"{car['year']} {car['brand']} {car['model']}",
+                   "quantity": 1, "price": f"{float(car['price']):.2f}"}],
         "currency": "USD",
-        "buyer_name": data.get("buyer_name", ""),
-        "buyer_email": data.get("buyer_email", "")
+        "callbackUrl": callback
     }
     try:
-        resp = requests.post(f"{PAYPAL_SERVICE_URL}/orders",
+        resp = requests.post(f"{PAYPAL_SERVICE_URL}/sessions",
                              json=payload, headers=_payment_headers(), timeout=10)
         resp.raise_for_status()
         pd = resp.json()
-        if pd.get("status") in ("approved", "COMPLETED"):
-            car.update({"sold":True,"available":False,"payment_id":pd.get("id") or pd.get("payment_id"),
-                        "updated_at":datetime.utcnow().isoformat()})
-        return jsonify({"car":car,"payment":pd}), resp.status_code
+        checkout_url = pd.get("checkoutUrl", "").replace("localhost:10000", "payment-w1qr.onrender.com")
+        return jsonify({"car":car,"payment":pd,"checkout_url":checkout_url}), 200
     except requests.exceptions.ConnectionError:
         return jsonify({"error":"Payment service unavailable."}), 503
     except requests.exceptions.Timeout:
