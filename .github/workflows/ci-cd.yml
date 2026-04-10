@@ -117,6 +117,7 @@ jobs:
       - name: Push versioned and latest tags
         run: |
           docker push ${{ env.IMAGE_NAME }}:${{ github.run_number }}
+          docker tag ${{ env.IMAGE_NAME }}:${{ github.run_number }} ${{ env.IMAGE_NAME }}:latest
           docker push ${{ env.IMAGE_NAME }}:latest
           echo "Pushed ${{ env.IMAGE_NAME }}:${{ github.run_number }} and :latest"
 
