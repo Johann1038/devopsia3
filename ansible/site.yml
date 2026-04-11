@@ -11,7 +11,7 @@
 
 - name: Install and configure Docker on all nodes
   hosts: all
-  become: true
+  become: false
   gather_facts: true
   tags: [docker]
   roles:
@@ -19,7 +19,7 @@
 
 - name: Install kubectl on Kubernetes nodes
   hosts: k8s_cluster
-  become: true
+  become: false
   gather_facts: true
   tags: [kubernetes]
   roles:
@@ -27,7 +27,7 @@
 
 - name: Install Jenkins CI/CD server
   hosts: jenkins_server
-  become: true
+  become: false
   gather_facts: true
   tags: [jenkins]
   roles:

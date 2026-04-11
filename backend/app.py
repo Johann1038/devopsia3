@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime
 from functools import wraps
 
+import time
 import requests
 from flask import (Flask, jsonify, request, render_template,
                    abort, session, redirect, url_for, flash)
@@ -320,19 +321,25 @@ def purchase_car(car_id):
         "currency": "USD",
         "callbackUrl": callback
     }
-    try:
-        resp = requests.post(f"{PAYPAL_SERVICE_URL}/sessions",
-                             json=payload, headers=_payment_headers(), timeout=10)
-        resp.raise_for_status()
-        pd = resp.json()
-        checkout_url = pd.get("checkoutUrl", "").replace("localhost:10000", "payment-w1qr.onrender.com")
-        return jsonify({"car":car,"payment":pd,"checkout_url":checkout_url}), 200
-    except requests.exceptions.ConnectionError:
-        return jsonify({"error":"Payment service unavailable."}), 503
-    except requests.exceptions.Timeout:
-        return jsonify({"error":"Payment service timed out."}), 504
-    except requests.exceptions.HTTPError as e:
-        return jsonify({"error":f"Payment error: {e}"}), 502
+    for attempt in range(3):
+        try:
+            resp = requests.post(f"{PAYPAL_SERVICE_URL}/sessions",
+                                 json=payload, headers=_payment_headers(), timeout=10)
+            if resp.status_code == 429:
+                if attempt < 2:
+                    time.sleep(2 ** attempt)
+                    continue
+                return jsonify({"error":"Payment service is busy. Please try again in a moment."}), 429
+            resp.raise_for_status()
+            pd = resp.json()
+            checkout_url = pd.get("checkoutUrl", "").replace("localhost:10000", "payment-w1qr.onrender.com")
+            return jsonify({"car":car,"payment":pd,"checkout_url":checkout_url}), 200
+        except requests.exceptions.ConnectionError:
+            return jsonify({"error":"Payment service unavailable."}), 503
+        except requests.exceptions.Timeout:
+            return jsonify({"error":"Payment service timed out."}), 504
+        except requests.exceptions.HTTPError as e:
+            return jsonify({"error":f"Payment error: {e}"}), 502
 
 @app.route("/api/payment/status/<string:payment_id>")
 def payment_status(payment_id):

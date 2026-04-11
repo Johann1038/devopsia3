@@ -1,66 +1,9 @@
 ---
 # ════════════════════════════════════════════════════════════════════════════
-# Role: kubernetes — Install kubectl on Ubuntu/Debian hosts
+# Role: kubernetes — Verify kubectl is installed and cluster is reachable
 # ════════════════════════════════════════════════════════════════════════════
 
-- name: Update apt cache
-  apt:
-    update_cache: true
-    cache_valid_time: 3600
-
-- name: Install dependencies
-  apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - gnupg
-    state: present
-
-- name: Add Kubernetes GPG key
-  apt_key:
-    url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
-    state: present
-
-- name: Add Kubernetes apt repository
-  apt_repository:
-    repo: "deb https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /"
-    state: present
-    filename: kubernetes
-
-- name: Update apt cache after adding Kubernetes repo
-  apt:
-    update_cache: true
-
-- name: Install kubectl
-  apt:
-    name: kubectl
-    state: present
-  notify: Verify kubectl
-
-- name: Hold kubectl at installed version (prevent unintended upgrades)
-  dpkg_selections:
-    name: kubectl
-    selection: hold
-
-- name: Create .kube directory for the ansible user
-  file:
-    path: "/home/{{ ansible_user }}/.kube"
-    state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: '0700'
-
-- name: Copy kubeconfig to the ansible user's home (if kubeconfig_src is defined)
-  copy:
-    src: "{{ kubeconfig_src }}"
-    dest: "/home/{{ ansible_user }}/.kube/config"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: '0600'
-  when: kubeconfig_src is defined
-
-- name: Verify kubectl installation
+- name: Check kubectl is installed
   command: kubectl version --client --output=yaml
   register: kubectl_version
   changed_when: false
@@ -68,3 +11,33 @@
 - name: Print kubectl version
   debug:
     msg: "kubectl installed: {{ kubectl_version.stdout_lines[0] }}"
+
+- name: Check Kubernetes cluster nodes
+  command: kubectl get nodes
+  register: k8s_nodes
+  changed_when: false
+  ignore_errors: true
+
+- name: Print cluster nodes
+  debug:
+    msg: "{{ k8s_nodes.stdout_lines }}"
+
+- name: Check pods in luxury-cars namespace
+  command: kubectl get pods -n luxury-cars
+  register: k8s_pods
+  changed_when: false
+  ignore_errors: true
+
+- name: Print running pods
+  debug:
+    msg: "{{ k8s_pods.stdout_lines }}"
+
+- name: Check HPA in luxury-cars namespace
+  command: kubectl get hpa -n luxury-cars
+  register: k8s_hpa
+  changed_when: false
+  ignore_errors: true
+
+- name: Print HPA status
+  debug:
+    msg: "{{ k8s_hpa.stdout_lines }}"

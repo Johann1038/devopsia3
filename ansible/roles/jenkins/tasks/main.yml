@@ -1,94 +1,35 @@
 ---
 # ════════════════════════════════════════════════════════════════════════════
-# Role: jenkins — Install and configure Jenkins on Ubuntu/Debian
+# Role: jenkins — Verify Jenkins container is running
 # ════════════════════════════════════════════════════════════════════════════
 
-- name: Update apt cache
-  apt:
-    update_cache: true
-    cache_valid_time: 3600
-
-- name: Install Java (required by Jenkins)
-  apt:
-    name: openjdk-17-jdk
-    state: present
-
-- name: Add Jenkins GPG key
-  apt_key:
-    url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-    state: present
-
-- name: Add Jenkins apt repository
-  apt_repository:
-    repo: "deb https://pkg.jenkins.io/debian-stable binary/"
-    state: present
-    filename: jenkins
-
-- name: Update apt cache after adding Jenkins repo
-  apt:
-    update_cache: true
-
-- name: Install Jenkins
-  apt:
-    name: jenkins
-    state: present
-  notify: Restart Jenkins
-
-- name: Enable and start Jenkins service
-  systemd:
-    name: jenkins
-    enabled: true
-    state: started
-
-- name: Wait for Jenkins to be ready (port 8080)
-  wait_for:
-    port: 8080
-    delay: 10
-    timeout: 120
-    state: started
-
-- name: Install required Jenkins plugins via CLI
-  jenkins_plugin:
-    name: "{{ item }}"
-    state: present
-    url: http://localhost:8080
-    url_username: admin
-    url_password: "{{ jenkins_admin_password | default('admin') }}"
-    timeout: 60
-  loop:
-    - git
-    - docker-workflow
-    - pipeline-stage-view
-    - kubernetes-cli
-    - junit
-    - blueocean
-  ignore_errors: true   # Plugins may need UI restart; not fatal at provision time
-  notify: Restart Jenkins
-
-- name: Allow Jenkins user to run Docker
-  user:
-    name: jenkins
-    groups: docker
-    append: true
-  notify: Restart Jenkins
-
-- name: Configure Jenkins JVM options for memory
-  lineinfile:
-    path: /etc/default/jenkins
-    regexp: '^JAVA_ARGS='
-    line: 'JAVA_ARGS="-Djava.awt.headless=true -Xmx512m -Xms256m"'
-    create: true
-    mode: '0644'
-  notify: Restart Jenkins
-
-- name: Retrieve Jenkins initial admin password
-  command: cat /var/lib/jenkins/secrets/initialAdminPassword
-  register: jenkins_init_password
+- name: Check Jenkins container is running
+  command: docker inspect jenkins
+  register: jenkins_status
   changed_when: false
   ignore_errors: true
 
-- name: Print Jenkins initial admin password
+- name: Print Jenkins container status
   debug:
-    msg: >
-      Jenkins is running on http://{{ ansible_host }}:8080
-      Initial admin password: {{ jenkins_init_password.stdout | default('Already configured') }}
+    msg: "Jenkins container found and inspected"
+  when: jenkins_status.rc == 0
+
+- name: Check Jenkins is responding
+  command: docker exec jenkins curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login
+  register: jenkins_http
+  changed_when: false
+  ignore_errors: true
+
+- name: Print Jenkins HTTP status
+  debug:
+    msg: "Jenkins HTTP response code: {{ jenkins_http.stdout | default('unreachable') }}"
+
+- name: List Jenkins jobs
+  command: docker exec jenkins ls /var/jenkins_home/jobs/
+  register: jenkins_jobs
+  changed_when: false
+  ignore_errors: true
+
+- name: Print Jenkins jobs
+  debug:
+    msg: "Jenkins jobs: {{ jenkins_jobs.stdout_lines | default(['No jobs found']) }}"

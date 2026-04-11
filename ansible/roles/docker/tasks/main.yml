@@ -1,70 +1,9 @@
 ---
 # ════════════════════════════════════════════════════════════════════════════
-# Role: docker — Install Docker Engine on Ubuntu/Debian hosts
+# Role: docker — Verify Docker Engine is installed and running
 # ════════════════════════════════════════════════════════════════════════════
 
-- name: Update apt cache
-  apt:
-    update_cache: true
-    cache_valid_time: 3600
-
-- name: Install prerequisites for Docker
-  apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - gnupg
-      - lsb-release
-      - software-properties-common
-    state: present
-
-- name: Add Docker's official GPG key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-
-- name: Add Docker apt repository
-  apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-    state: present
-    filename: docker
-
-- name: Update apt cache after adding Docker repo
-  apt:
-    update_cache: true
-
-- name: Install Docker Engine, CLI, and containerd
-  apt:
-    name:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
-      - docker-buildx-plugin
-      - docker-compose-plugin
-    state: present
-  notify: Restart Docker
-
-- name: Enable and start Docker service
-  systemd:
-    name: docker
-    enabled: true
-    state: started
-
-- name: Add current ansible user to the docker group
-  user:
-    name: "{{ ansible_user }}"
-    groups: docker
-    append: true
-
-- name: Add jenkins user to docker group (if jenkins is also on this host)
-  user:
-    name: jenkins
-    groups: docker
-    append: true
-  ignore_errors: true   # jenkins user may not exist on this host
-
-- name: Verify Docker installation
+- name: Check Docker is installed
   command: docker --version
   register: docker_version
   changed_when: false
@@ -72,3 +11,21 @@
 - name: Print Docker version
   debug:
     msg: "Docker installed: {{ docker_version.stdout }}"
+
+- name: Check Docker daemon is running
+  command: docker info
+  register: docker_info
+  changed_when: false
+
+- name: Print Docker daemon status
+  debug:
+    msg: "Docker daemon is running"
+
+- name: List running containers
+  command: docker ps
+  register: docker_containers
+  changed_when: false
+
+- name: Print running containers
+  debug:
+    msg: "{{ docker_containers.stdout_lines }}"
